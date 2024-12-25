@@ -1,4 +1,3 @@
-from langchain_core.prompts import load_prompt
 from langchain_core.output_parsers import StrOutputParser
 from langchain_community.vectorstores import FAISS
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
@@ -11,7 +10,7 @@ from langchain import hub
 class RetrievalChain(ABC):
     def __init__(self, **kwargs):
         self.source_uri = kwargs.get("source_uri", None)
-        self.k = kwargs.get("k", 10)
+        self.k = kwargs.get("k", 6)
         self.embeddings = kwargs.get("embeddings", None)
 
     @abstractmethod
@@ -44,10 +43,10 @@ class RetrievalChain(ABC):
         return dense_retriever
 
     def create_model(self):
-        return ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+        return ChatOpenAI(model_name="gpt-4o", temperature=0)
 
     def create_prompt(self):
-        return hub.pull("teddynote/rag-prompt-chat-history")
+        return hub.pull("teddynote/rag-prompt")
 
     @staticmethod
     def format_docs(docs):
@@ -65,7 +64,6 @@ class RetrievalChain(ABC):
             {
                 "question": itemgetter("question"),
                 "context": itemgetter("context"),
-                "chat_history": itemgetter("chat_history"),
             }
             | prompt
             | model
